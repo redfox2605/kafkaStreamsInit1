@@ -51,6 +51,10 @@
                             <addClasspath>true</addClasspath>
                             <mainClass>com.github.kafka.streams.WordCountApp</mainClass>
                         </manifest>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>com.github.kafka.streams.FavouriteColor</mainClass>
+                        </manifest>
                     </archive>
                 </configuration>
                 <executions>

@@ -3,6 +3,7 @@ package com.github.kafka.streams;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KStreamBuilder;
@@ -23,22 +24,23 @@ public class WordCountApp {
         config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
 
-         KStreamBuilder builder = new KStreamBuilder();
-         // Stream from kafka
-         KStream<String,String> wordCountInput = builder.stream("word-count-input");
-         KTable<String,Long> wordCounts = wordCountInput.mapValues(value -> value.toLowerCase())
-                                         .flatMapValues(value -> Arrays.asList(value.split("\\W+") ))
-                                         .selectKey((ignoredKey, word) ->  word)
-                                         .groupByKey()
-                                         .count("Counts");
+        //KStreamBuilder builder = new KStreamBuilder();
+        StreamsBuilder builder = new StreamsBuilder();
+        // Stream from kafka
+        KStream<String, String> wordCountInput = builder.stream("word-count-input");
+        KTable<String, Long> wordCounts = wordCountInput.mapValues(value -> value.toLowerCase())
+                .flatMapValues(value -> Arrays.asList(value.split("\\W+")))
+                .selectKey((ignoredKey, word) -> word)
+                .groupByKey()
+                .count("Counts");
 
-         wordCounts.to(Serdes.String(),Serdes.Long(), "word-count-output");
+        wordCounts.to(Serdes.String(), Serdes.Long(), "word-count-output");
 
-        KafkaStreams kafkaStreams = new KafkaStreams(builder,config);
+        KafkaStreams kafkaStreams = new KafkaStreams(builder.build(), config);
         kafkaStreams.start();
 
 
         System.out.println(kafkaStreams.toString());
-        Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close ));
+        Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));
     }
 }
