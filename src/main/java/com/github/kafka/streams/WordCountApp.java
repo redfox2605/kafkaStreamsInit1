@@ -3,7 +3,6 @@ package com.github.kafka.streams;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KStreamBuilder;
@@ -25,7 +24,7 @@ public class WordCountApp {
 
 
         //KStreamBuilder builder = new KStreamBuilder();
-        StreamsBuilder builder = new StreamsBuilder();
+        KStreamBuilder builder = new KStreamBuilder();
         // Stream from kafka
         KStream<String, String> wordCountInput = builder.stream("word-count-input");
         KTable<String, Long> wordCounts = wordCountInput.mapValues(value -> value.toLowerCase())
@@ -36,7 +35,7 @@ public class WordCountApp {
 
         wordCounts.to(Serdes.String(), Serdes.Long(), "word-count-output");
 
-        KafkaStreams kafkaStreams = new KafkaStreams(builder.build(), config);
+        KafkaStreams kafkaStreams = new KafkaStreams(builder, config);
         kafkaStreams.start();
 
 
